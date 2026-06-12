@@ -3,7 +3,7 @@ from socket import *
 import sys
 import time
 
-WEBSERVER_HOST = "localhost"
+WEBSERVER_HOST = "172.20.10.4"
 WEBSERVER_PORT = 8000
 
 

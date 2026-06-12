@@ -4,8 +4,8 @@ import threading
 import os
 import time
 
-if len(sys.argv) <= 1:
-    print('Usage: "python proxy.py <proxy_ip>"')
+if len(sys.argv) < 3:
+    print('Usage: "python proxy.py <proxy_ip> <upstream_host> [upstream_port]"')
     sys.exit(2)
 
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
@@ -17,6 +17,9 @@ tcpSerSock.listen(20)
 
 CACHE_DIR = "."
 CACHE_EXPIRY = 60
+
+UPSTREAM_HOST = sys.argv[2]
+UPSTREAM_PORT = int(sys.argv[3]) if len(sys.argv) > 3 else 8000
 
 
 def load_error_page(status_code):
@@ -102,7 +105,7 @@ def handleClient(tcpCliSock, addr):
     elif raw_filename.startswith("https://"):
         filename = raw_filename.replace("https://", "", 1)
     else:
-        filename = raw_filename
+        filename = f"{UPSTREAM_HOST}:{UPSTREAM_PORT}/{raw_filename}"
 
     print("Raw filename:", filename)
 
@@ -165,7 +168,7 @@ def handleClient(tcpCliSock, addr):
     tcpCliSock.close()
 
 
-print(f"Proxy server listening on {proxy_ip}:{proxy_port}")
+print(f"Proxy server listening on {proxy_ip}:{proxy_port}, forwarding to {UPSTREAM_HOST}:{UPSTREAM_PORT}")
 
 while True:
     tcpCliSock, addr = tcpSerSock.accept()
